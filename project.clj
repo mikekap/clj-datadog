@@ -12,4 +12,5 @@
 
   :target-path "target/%s"
 
-  :profiles {:uberjar {:aot :all}})
+  :profiles {:uberjar {:aot :all}
+             :test {:dependencies [[expectations "2.0.9"]]}})

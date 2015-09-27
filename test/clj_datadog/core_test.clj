@@ -1,19 +1,59 @@
 (ns clj-datadog.core-test
   (:require [clojure.test :refer :all]
-            [clj-datadog.core :as dd])
-  ;; (:use [clj-datadog.core]
-  ;;       [clojure.test])
-  )
+            [clj-datadog.core :as dd]
+            [expectations :refer [expect side-effects]]))
 
-(defmacro should-send-msg
-  "Assert that the expected stat is passed to the send-msg method
-   the expected number of times."
-  [command result]
+(defmacro last-sent-msg
+  "Returns last data that was sent to `dd/send-msg`
+   during execution of the body"
+  [& body]
   `(let [sended# (atom nil)]
      (with-redefs
        [dd/send-msg (fn [value#] (reset! sended# value#))]
-       ~command
-       (is (= @sended# ~result)))))
+       ~@body
+       @sended#)))
 
 (deftest should-send-increment
-  (should-send-msg (dd/increment "page.views") "page.views:1|c"))
+  (expect "page.views:1|c"
+            (last-sent-msg (dd/increment "page.views")))
+  (expect "page.views:7|c"
+          (last-sent-msg (dd/increment "page.views" 7)))
+
+  (expect "page.views:1|c|#page:contacts"
+          (last-sent-msg (dd/increment "page.views" {:page "contacts"})))
+  (expect "page.views:8|c|#page:contacts"
+          (last-sent-msg (dd/increment "page.views" 8 {:page "contacts"}))))
+
+(deftest should-send-decrement
+  (expect "users.online:-1|c"
+          (last-sent-msg (dd/decrement "users.online")))
+  (expect "users.online:-3|c"
+          (last-sent-msg (dd/decrement "users.online" 3)))
+  (expect "users.online:-1|c|#group:admins"
+          (last-sent-msg (dd/decrement "users.online" {:group "admins"})))
+  (expect "users.online:-5|c|#group:admins"
+          (last-sent-msg (dd/decrement "users.online" 5 {:group "admins"}))))
+
+(deftest should-send-gauge
+  (expect "total.posts:526|g"
+          (last-sent-msg (dd/gauge "total.posts" 526)))
+  (expect "total.posts:526|g|#site:main"
+          (last-sent-msg (dd/gauge "total.posts" 526 {:site "main"}))))
+
+(deftest should-send-timings
+  (expect "db.query.time:576|ms"
+          (last-sent-msg (dd/timing "db.query.time" 576)))
+  (expect "db.query.time:843|ms|#query:find-by-id"
+          (last-sent-msg (dd/timing "db.query.time" 843 {:query "find-by-id"}))))
+
+;; We tested that `dd/timing` sends data correctly
+;; So we know it works in next test, so we wont chack value
+(deftest should-measure-time
+  (expect #"something.done:\d*\|ms\|#tag:present"
+          (last-sent-msg (dd/timed "something.done" {:tag "present"}
+                                   (do (str "Whatever passed -"
+                                            "is passed")))))
+  (expect #"something.done:\d*\|ms"
+          (last-sent-msg (dd/timed "something.done" {}
+                                   (do (str "Whatever passed -"
+                                            "is passed"))))))

@@ -78,8 +78,9 @@
    or the size of files uploaded by users. Each histogram will
    track the average, the minimum, the maximum, the median,
    the 95th percentile and the count."
-  [metric value tags]
-  (send-msg (str metric ":" value "|g" (format-tags tags))))
+  ([metric value] (gauge metric value {}))
+  ([metric value tags]
+   (send-msg (str metric ":" value "|g" (format-tags tags)))))
 
 (comment
   (gauge "file.upload.size" (:size file))
