@@ -5,6 +5,8 @@ for the [Clojure](http://clojure.org) programming language.
 
 [![Circle CI](https://circleci.com/gh/truckerpathteam/clj-datadog.svg?style=shield)](https://circleci.com/gh/truckerpathteam/clj-datadog)
 
+[![Clojars Project](http://clojars.org/clj-datadog/latest-version.svg)](https://clojars.org/clj-datadog)
+
 ## Installation
 
 Include the following dependency in your project.clj file:
