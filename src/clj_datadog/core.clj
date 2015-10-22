@@ -18,7 +18,10 @@
   [tags]
   (if (empty? tags)
     ""
-    (let [format-pair (fn [[key value]] (str (name key) ":" value))
+    (let [format-pair (fn [[key value]]
+                        (str (name key)
+                             (if (some? value) ":")
+                             (if (keyword? value) (name value) (str value))))
         tags-list (map format-pair tags)
         reduced-tags (clojure.string/join "," tags-list)]
       (str "|#" reduced-tags))))

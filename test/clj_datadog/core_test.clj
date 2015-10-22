@@ -13,6 +13,18 @@
        ~@body
        @sended#)))
 
+(deftest should-format-tags
+  (expect "|#site:main"
+          (dd/format-tags {:site :main}))
+  (expect "|#page:contacts"
+          (dd/format-tags {:page "contacts"}))
+  (expect "|#status:200"
+          (dd/format-tags {:status 200}))
+  (expect "|#error"
+          (dd/format-tags {:error nil}))
+  (expect "|#site:main,page:contacts,status:200"
+          (dd/format-tags {:site :main, :page "contacts", "status" 200})))
+
 (deftest should-send-increment
   (expect "page.views:1|c"
             (last-sent-msg (dd/increment "page.views")))
