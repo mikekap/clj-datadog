@@ -1,16 +1,17 @@
-(defproject clj-datadog "1.0.1"
+(defproject clj-datadog "2.0.0"
   :description "Clojure client for DataDog service via statsd protocol"
   :url "https://github.com/truckerpathteam/clj-datadog"
 
-  :dependencies [[org.clojure/clojure "1.6.0"]
-                 [environ "1.0.0"]]
+  :dependencies [[org.clojure/clojure "1.7.0"]]
 
   :main ^:skip-aot clj-datadog.core
 
   :target-path "target/%s"
 
   :profiles {:uberjar {:aot :all}
-             :test {:dependencies [[expectations "2.0.9"]]}}
+             :dev {:dependencies [[expectations "2.0.9"]]}}
+
+  :plugins [[lein-expectations "0.0.8"]]
 
   ;; Artifact deployment info
   :scm {:name "git"

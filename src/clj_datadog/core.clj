@@ -4,14 +4,8 @@
 
    Comments for metrics are taken from official documentation:
    http://docs.datadoghq.com/guides/dogstatsd"
-  (:require [environ.core :refer [env]])
   (:import (java.net InetAddress DatagramPacket DatagramSocket))
   (:gen-class))
-
-;; Default connection parameters
-
-(def ^:private server-host (env :datadog-host "127.0.0.1"))
-(def ^:private server-port (env :datadog-port 8125))
 
 (defn format-tags
   "Construcsts statsd-formatted string with tags"
@@ -26,54 +20,60 @@
         reduced-tags (clojure.string/join "," tags-list)]
       (str "|#" reduced-tags))))
 
+(defn- conn
+  [conn-spec]
+  (let [default {:host "127.0.0.1" :port 8125}]
+    (if (seq conn-spec)
+      conn-spec
+      default)))
+
 ;; UDP helper functions
 
 (defn- make-socket
-  ([] (new DatagramSocket))
-  ([port] (new DatagramSocket port)))
+  ([] (DatagramSocket.))
+  ([port] (DatagramSocket. port)))
 
-(defn- send-data [send-socket ip port data]
-  (let [ip-address (InetAddress/getByName ip),
-        send-packet (new DatagramPacket
+(defn- send-data [send-socket host port data]
+  (let [ip-address (InetAddress/getByName host),
+        send-packet (DatagramPacket.
                          (.getBytes data)
                          (.length data)
                          ip-address
                          port)]
   (.send send-socket send-packet)))
 
-(defn- make-send [ip port]
-  (let [send-socket (make-socket)]
-       (fn [data] (send-data send-socket ip port data))))
-
-(def ^:private send-msg (make-send server-host server-port))
+(defn- send-msg [conn-spec data]
+  (let [send-socket (make-socket)
+        {:keys [host port]} (conn conn-spec)]
+       (send-data send-socket host port data)))
 
 ;; StatsD client functions
 
 (defn increment
   "Counters track how many times something happened per second,
    like the number of database requests or page views."
-  ([metric] (increment metric 1))
-  ([metric arg] (if (map? arg)
-                  (increment metric 1 arg)
-                  (increment metric arg {})))
-  ([metric value tags]
-   (send-msg (str metric ":" value "|c" (format-tags tags)))))
+  ([conn-spec metric] (increment conn-spec metric 1 {}))
+  ([conn-spec metric arg] (if (map? arg)
+                            (increment conn-spec metric 1 arg)
+                            (increment conn-spec metric arg {})))
+  ([conn-spec metric value tags]
+   (send-msg conn-spec (str metric ":" value "|c" (format-tags tags)))))
 
 (comment
-  (increment "database.query.count")
-  (increment "page_views.count" 10 {:page "contacts"}))
+  (increment {} "database.query.count")
+  (increment {:host "localhost" :port 1234} "page_views.count" 10 {:page "contacts"}))
 
 (defn decrement
   "Shorthand for incrementing by negative values."
-  ([metric] (increment metric -1))
-  ([metric arg] (if (map? arg)
-                  (decrement metric 1 arg)
-                  (decrement metric arg {})))
-  ([metric value tags] (increment metric (- value) tags)))
+  ([conn-spec metric] (decrement conn-spec metric 1 {}))
+  ([conn-spec metric arg] (if (map? arg)
+                            (decrement conn-spec metric 1 arg)
+                            (decrement conn-spec metric arg {})))
+  ([conn-spec metric value tags] (increment conn-spec metric (- value) tags)))
 
 (comment
-  (decrement "comments")
-  (decrement "users.online" {:group "administrators"}))
+  (decrement {} "comments")
+  (decrement {:host "localhost" :port 1234} "users.online" {:group "administrators"}))
 
 (defn gauge
   "Histograms track the statistical distribution of a set of
@@ -81,13 +81,13 @@
    or the size of files uploaded by users. Each histogram will
    track the average, the minimum, the maximum, the median,
    the 95th percentile and the count."
-  ([metric value] (gauge metric value {}))
-  ([metric value tags]
-   (send-msg (str metric ":" value "|g" (format-tags tags)))))
+  ([conn-spec metric value] (gauge conn-spec metric value {}))
+  ([conn-spec metric value tags]
+   (send-msg conn-spec (str metric ":" value "|g" (format-tags tags)))))
 
 (comment
-  (gauge "file.upload.size" (:size file))
-  (gauge "file.size" (:size file) {:type "upload"}))
+  (gauge {} "file.upload.size" (:size file))
+  (gauge {:host "localhost" :port 1234} "file.size" (:size file) {:type "upload"}))
 
 (defn timing
   "StatsD only supports histograms for timing, not generic values
@@ -97,25 +97,25 @@
    backwards compatibility.
 
    You might consider using macro `timed`"
-  ([metric value] (timing metric value {}))
-  ([metric value tags]
-   (send-msg (str metric ":" value "|ms" (format-tags tags)))))
+  ([conn-spec metric value] (timing conn-spec metric value {}))
+  ([conn-spec metric value tags]
+   (send-msg conn-spec (str metric ":" value "|ms" (format-tags tags)))))
 
 (comment
-  (timing "services.api" elapsed)
-  (timing "databse.query.time" elapsed {:query "filtered"}))
+  (timing {} "services.api" elapsed)
+  (timing {:host "localhost" :port 1234} "databse.query.time" elapsed {:query "filtered"}))
 
 (defmacro timed
   "Measure time of the execution of the provided body parts,
    and then report measured time.
    Returns value returned by last expression."
-  [metric tags & body]
+  [conn-spec metric tags & body]
   `(let [start# (System/currentTimeMillis)
          result# (do ~@body)
          time# (- (System/currentTimeMillis) start#)]
-     (timing ~metric time# ~tags)
+     (timing ~conn-spec ~metric time# ~tags)
      result#))
 
 (comment
-  (timed "database.query.time" {:query "find-by-id"}
+  (timed {} "database.query.time" {:query "find-by-id"}
          (db.find-by-id id)))
