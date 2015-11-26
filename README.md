@@ -36,7 +36,7 @@ Following datadog metric methods are available:
 You have to provide a map with host and port of DataDog agent or an empty map
 to use default (`{:host "127.0.0.1" :port 8125}`).
 
-You may also create macroses like
+You may also create macros like
 ```clojure
 (def datadog-spec {:host "ddhost" :port 8126})
 (defmacro dd-inc [& args] `(dd/increment datadog-spec ~@args))
