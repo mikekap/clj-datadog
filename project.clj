@@ -20,7 +20,6 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :signing {:gpg-key "9E4DE0B2"}
   :deploy-repositories [["clojars" {:creds :gpg}]]
 
   :pom-addition [:developers [:developer
