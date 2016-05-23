@@ -1,7 +1,7 @@
-(ns clj-datadog.core-test
-  (:require [clojure.test :refer :all]
-            [clj-datadog.core :as dd]
-            [expectations :refer [expect side-effects]]))
+(ns truckerpath.clj-datadog.core-test
+  (:require [expectations :refer [expect]]
+            [truckerpath.clj-datadog.core :as dd]
+            [truckerpath.clj-datadog.component :as dd-comp]))
 
 (defmacro last-sent-msg
   "Returns last data that was sent to `dd/send-msg`
