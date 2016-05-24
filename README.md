@@ -7,14 +7,11 @@ for the [Clojure](http://clojure.org) programming language.
 
 [![Clojars Project](http://clojars.org/clj-datadog/latest-version.svg)](https://clojars.org/clj-datadog)
 
-**Version `2.0.0` contains breaking changes in API and no longer accepting
-DataDog agent connection parameters through java options or environment vars.**
-
 ## Installation
 
 Include the following dependency in your project.clj file:
 
-    :dependencies [[clj-datadog "2.0.0"]]
+    :dependencies [[clj-datadog "3.0.0"]]
 
 
 ## Example Usage
@@ -74,6 +71,10 @@ In second case tags are required, even if empty.
     (dd/timing {} "db.query.time" 843 {:query "find-by-id"})
     (dd/timed {} "external.service.call" {:service service}
               (http/get remote-uri {:socket-timeout timeout}))
+
+## Component
+
+Implementation of [component](https://github.com/stuartsierra/component) is available in `truckerpath.clj-datadog.component` package.
 
 ## Testing
 
