@@ -24,7 +24,7 @@ application.
 
 Then import datadog in your namespace:
 
-    (require '[clj-datadog.core :as dd])
+    (require '[truckerpath.clj-datadog.core :as dd])
 
 Following datadog metric methods are available:
 
