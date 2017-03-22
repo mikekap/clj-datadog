@@ -1,5 +1,8 @@
 # clj-datadog change log
 
+## 3.0.1
+ * Replace System/currentTimeMillis with System/nanoTime in timed
+
 ## 3.0.0
  * **Breaking** All packages have been moved into `truckerpath` package
  * Add [component](https://github.com/stuartsierra/component) implementation

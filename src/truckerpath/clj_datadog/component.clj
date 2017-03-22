@@ -52,6 +52,6 @@
   [datadog metric tags & body]
   `(let [start# (System/currentTimeMillis)
          result# (do ~@body)
-         time# (- (System/currentTimeMillis) start#)]
+         time# (format "%f" (/ (- (System/nanoTime) start#) 1000000.0))]
      (timing ~datadog ~metric time# ~tags)
      result#))

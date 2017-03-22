@@ -3,7 +3,7 @@
 `clj-datadog` is a client for [DataDog](https://www.datadoghq.com) service
 for the [Clojure](http://clojure.org) programming language.
 
-[![Circle CI](https://circleci.com/gh/truckerpathteam/clj-datadog.svg?style=shield)](https://circleci.com/gh/truckerpathteam/clj-datadog)
+[![Circle CI](https://circleci.com/gh/truckerpath/clj-datadog.svg?style=shield)](https://circleci.com/gh/truckerpath/clj-datadog)
 
 [![Clojars Project](http://clojars.org/clj-datadog/latest-version.svg)](https://clojars.org/clj-datadog)
 
@@ -11,7 +11,7 @@ for the [Clojure](http://clojure.org) programming language.
 
 Include the following dependency in your project.clj file:
 
-    :dependencies [[clj-datadog "3.0.0"]]
+    :dependencies [[clj-datadog "3.0.1"]]
 
 
 ## Example Usage
