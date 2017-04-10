@@ -28,13 +28,14 @@
 
 ;; UDP helper
 
+(def udp-socket (delay (DatagramSocket.)))
+
 (defn- send-msg
   [conn-spec data]
   (let [{:keys [host port]} (conn conn-spec)
         ip-address (InetAddress/getByName host),
-        packet (DatagramPacket. (.getBytes data) (.length data) ip-address port)
-        socket (DatagramSocket.)]
-    (.send socket packet)))
+        packet (DatagramPacket. (.getBytes data) (.length data) ip-address port)]
+    (.send @udp-socket packet)))
 
 ;; StatsD client functions
 
