@@ -97,8 +97,8 @@
    and then report measured time.
    Returns value returned by last expression."
   [conn-spec metric tags & body]
-  `(let [start# (System/currentTimeMillis)
+  `(let [start# (System/nanoTime)
          result# (do ~@body)
-         time# (- (System/currentTimeMillis) start#)]
+         time# (format "%f" (/ (- (System/nanoTime) start#) 1000000.0))]
      (timing ~conn-spec ~metric time# ~tags)
      result#))

@@ -59,11 +59,11 @@
 
 ;; We tested that `dd/timing` sends data correctly
 ;; So we know it works in next test, so we wont chack value
-(expect #"something.done:\d*\|ms\|#tag:present"
+(expect #"something.done:\d+(\.\d+)?\|ms\|#tag:present"
         (last-sent-msg (dd/timed {} "something.done" {:tag "present"}
                                  (do (str "Whatever passed -"
                                           "is passed")))))
-(expect #"something.done:\d*\|ms"
+(expect #"something.done:\d+(\.\d+)?\|ms"
         (last-sent-msg (dd/timed {} "something.done" {}
                                  (do (str "Whatever passed -"
                                           "is passed")))))
