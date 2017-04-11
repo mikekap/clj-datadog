@@ -1,4 +1,4 @@
-(defproject clj-datadog "3.0.0"
+(defproject clj-datadog "3.0.1"
   :description "Clojure client for DataDog service via statsd protocol"
   :url "https://github.com/truckerpathteam/clj-datadog"
 
