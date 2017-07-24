@@ -17,10 +17,4 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :deploy-repositories [["clojars" {:creds :gpg}]]
-
-  :pom-addition [:developers [:developer
-                              [:name "Anton Chebotaev"]
-                              [:url "http://chebotaev.me"]
-                              [:email "anton.chebotaev@gmail.com"]
-                              [:timezone "+3"]]])
+  :deploy-repositories [["clojars" {:creds :gpg}]])
