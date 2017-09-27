@@ -31,11 +31,11 @@
 (def udp-socket (delay (DatagramSocket.)))
 
 (defn- send-msg
-  [conn-spec data]
-  (let [{:keys [host port]} (conn conn-spec)
-        ip-address (InetAddress/getByName host),
+  [conn-spec ^String data]
+  (let [{:keys [host ^Integer port]} (conn conn-spec)
+        ^InetAddress ip-address (InetAddress/getByName host),
         packet (DatagramPacket. (.getBytes data) (.length data) ip-address port)]
-    (.send @udp-socket packet)))
+    (.send ^DatagramSocket @udp-socket packet)))
 
 ;; StatsD client functions
 
