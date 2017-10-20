@@ -4,7 +4,8 @@
 
    Comments for metrics are taken from official documentation:
    http://docs.datadoghq.com/guides/dogstatsd"
-  (:import (java.net InetAddress DatagramPacket DatagramSocket)))
+  (:import (java.net InetAddress DatagramPacket DatagramSocket)
+           (clojure.lang IDeref)))
 
 (defn format-tags
   "Construcsts statsd-formatted string with tags"
@@ -28,7 +29,11 @@
 
 ;; UDP helper
 
-(def udp-socket (delay (DatagramSocket.)))
+(defonce udp-socket (proxy [ThreadLocal IDeref] []
+                      (initialValue []
+                        (DatagramSocket.))
+                      (deref []
+                        (.get this))))
 
 (defn- send-msg
   [conn-spec ^String data]
